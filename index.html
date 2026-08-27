@@ -2,109 +2,134 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b315f">
   <meta name="description" content="Hệ thống theo dõi, giám sát và công khai kết quả giải quyết ý kiến, kiến nghị cử tri - HĐND phường Rạch Giá.">
-  <link rel="icon" href="/favicon.ico">
-  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <title>Hệ thống theo dõi kiến nghị cử tri - HĐND phường Rạch Giá</title>
   <style>
-    :root{--bg:#f4f7fb;--brand:#1259c3;--text:#0b315f}
-    *{box-sizing:border-box}
-    html,body{width:100%;height:100%;margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif}
-    /* allow page scrolling if needed (avoid hiding content on small screens) */
-    body{overflow:auto;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-    .loading{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,#eef5ff,#fff);z-index:999;color:var(--text);text-align:center;padding:24px;transition:opacity .25s ease}
-    .loading.hide{opacity:0;pointer-events:none;visibility:hidden}
-    .spinner{width:44px;height:44px;margin:0 auto 16px;border:4px solid #d9e7f7;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
-    .loading strong{display:block;font-size:17px;margin-bottom:6px}
-    .loading small{color:#63758b}
-    .fallback{display:none;margin-top:18px}
-    .fallback.show{display:block}
-    .fallback a{display:inline-block;padding:10px 16px;border-radius:9px;background:var(--brand);color:#fff;text-decoration:none;font-weight:600}
-    iframe{display:block;width:100%;height:100vh;border:0;background:#fff;min-height:600px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    /* small responsive tweaks */
-    @media (max-width:420px){
-      .loading{padding:18px}
-      .loading strong{font-size:15px}
+    :root{
+      --bg:#f5f7fb; --card:#ffffff; --muted:#63758b; --brand:#1259c3; --text:#0b315f;
+      --radius:14px; --glass: rgba(255,255,255,0.6);
     }
+    [data-theme="dark"]{
+      --bg:#071026; --card:rgba(10,16,30,0.6); --muted:#93a3bf; --text:#e6f0ff; --glass: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#ffffff);color:var(--text);-webkit-font-smoothing:antialiased}
+    body{padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom);display:flex;flex-direction:column;gap:12px;min-height:100vh}
+    header{display:flex;align-items:center;gap:12px;max-width:1100px;margin:0 auto;width:100%}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:44px;height:44px;background:linear-gradient(135deg,var(--brand),#3aa0ff);border-radius:10px;display:grid;place-items:center;color:white;font-weight:700;box-shadow:0 6px 18px rgba(18,89,195,0.18)}
+    .title{font-size:15px;font-weight:600}
+    .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+    .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .btn{appearance:none;border:0;background:transparent;color:var(--text);padding:8px 12px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(11,49,95,0.06)}
+    .btn.primary{background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(18,89,195,0.16)}
+    .frame-wrap{flex:1;max-width:1100px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:12px}
+    .card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 10px 30px rgba(13,30,60,0.08);min-height:60vh;display:flex;flex-direction:column}
+    iframe{flex:1;border:0;width:100%;min-height:420px;background:#fff}
+    /* loading overlay */
+    .loading-overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.4));backdrop-filter:blur(6px);z-index:40}
+    .loader-card{background:var(--glass);border-radius:12px;padding:18px 22px;text-align:center;box-shadow:0 6px 18px rgba(2,8,23,0.06)}
+    .dots{display:inline-flex;gap:6px;margin-top:8px}
+    .dot{width:9px;height:9px;background:var(--brand);border-radius:999px;opacity:0;animation:dots 1s infinite}
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.3s}
+    @keyframes dots{0%{transform:translateY(4px);opacity:0}40%{transform:translateY(0);opacity:1}80%{transform:translateY(-4px);opacity:0.6}100%{opacity:0}}
+    /* responsive */
+    @media (max-width:720px){ .card{min-height:70vh} .title{font-size:14px} }
   </style>
 </head>
 <body>
-  <div class="loading" id="loading" role="status" aria-live="polite">
-    <div>
-      <div class="spinner" aria-hidden="true"></div>
-      <strong>Đang mở hệ thống…</strong>
-      <small>Hội đồng nhân dân phường Rạch Giá</small>
-      <div class="fallback" id="fallback">
-        <a id="openDirect" href="#" target="_blank" rel="noopener noreferrer">Mở hệ thống trực tiếp</a>
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">RG</div>
+      <div>
+        <div class="title">Hệ thống theo dõi — HĐND phường Rạch Giá</div>
+        <div class="subtitle">Giám sát & công khai kết quả xử lý ý kiến, kiến nghị</div>
       </div>
     </div>
-  </div>
 
-  <iframe
-    id="appFrame"
-    title="Hệ thống theo dõi, giám sát và công khai kết quả giải quyết ý kiến, kiến nghị cử tri"
-    allow="camera; microphone; clipboard-read; clipboard-write"
-    referrerpolicy="strict-origin-when-cross-origin">
-  </iframe>
-
-  <noscript>
-    <div style="padding:24px;text-align:center;background:#fff;">
-      <p><strong>JavaScript bị tắt</strong></p>
-      <p>Bấm vào nút dưới đây để mở hệ thống trực tiếp:</p>
-      <p><a href="https://script.google.com/macros/s/AKfycbzaV3Ts29UWnCuwLt6HQtAYr5b9jGujH-NVsr0T9JzjVN7YucT7E1RYLC4Ol3at8koISw/exec" target="_blank" rel="noopener noreferrer">Mở hệ thống trực tiếp</a></p>
+    <div class="actions" role="toolbar" aria-label="Hành động">
+      <button class="btn ghost" id="openDirect">Mở trực tiếp</button>
+      <button class="btn" id="reloadFrame" title="Tải lại">Tải lại</button>
+      <button class="btn primary" id="toggleTheme" title="Giao diện">Dark</button>
     </div>
-  </noscript>
+  </header>
+
+  <main class="frame-wrap">
+    <div class="card" id="card">
+      <div style="position:relative;flex:1">
+        <div class="loading-overlay" id="loading" role="status" aria-live="polite">
+          <div class="loader-card">
+            <div style="font-weight:700">Đang mở hệ thống…</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:6px">Hội đồng nhân dân phường Rạch Giá</div>
+            <div class="dots" aria-hidden="true">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+          </div>
+        </div>
+
+        <iframe id="appFrame" title="Hệ thống theo dõi, giám sát và công khai kết quả giải quyết ý kiến, kiến nghị cử tri"
+          referrerpolicy="strict-origin-when-cross-origin" allow="clipboard-read; clipboard-write"></iframe>
+      </div>
+    </div>
+
+    <noscript style="text-align:center;color:var(--muted)">
+      JavaScript bị tắt — <a id="openDirectNoJS" href="#" target="_blank" rel="noopener noreferrer">Mở hệ thống trực tiếp</a>
+    </noscript>
+  </main>
 
   <script>
     (function(){
       const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzaV3Ts29UWnCuwLt6HQtAYr5b9jGujH-NVsr0T9JzjVN7YucT7E1RYLC4Ol3at8koISw/exec';
       const frame = document.getElementById('appFrame');
       const loading = document.getElementById('loading');
-      const fallback = document.getElementById('fallback');
       const openDirect = document.getElementById('openDirect');
+      const openDirectNoJS = document.getElementById('openDirectNoJS');
+      const reloadBtn = document.getElementById('reloadFrame');
+      const themeBtn = document.getElementById('toggleTheme');
+      const root = document.documentElement;
 
-      openDirect.href = WEB_APP_URL;
-      // If your app doesn't need camera/mic, consider removing the allow attribute above.
+      openDirect.addEventListener('click', ()=> window.open(WEB_APP_URL, '_blank', 'noopener'));
+      openDirectNoJS && (openDirectNoJS.href = WEB_APP_URL);
+
       frame.src = WEB_APP_URL;
+      frame.addEventListener('load', ()=> loading.style.display = 'none');
 
-      // Hide loading when iframe reports load
-      frame.addEventListener('load', () => {
-        loading.classList.add('hide');
+      reloadBtn.addEventListener('click', ()=> {
+        loading.style.display = 'grid';
+        frame.contentWindow.location.reload();
       });
 
-      // Optional: listen for a postMessage from the embedded app to hide loader when app signals readiness.
-      // (Requires the embedded app to postMessage({appReady:true}, origin))
-      window.addEventListener('message', (ev) => {
-        try {
-          // only accept messages from script.google.com origin
-          if (!ev.origin || !ev.data) return;
-          if (ev.origin.indexOf('https://script.google.com') !== 0) return;
-          if (ev.data && ev.data.appReady === true) {
-            loading.classList.add('hide');
-          }
-        } catch (e) { /* ignore */ }
-      });
+      // theme toggle with persistence
+      const preferDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const saved = localStorage.getItem('pkg_theme');
+      let dark = saved ? saved === 'dark' : preferDark;
+      const updateThemeUI = ()=> {
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        themeBtn.textContent = dark ? 'Light' : 'Dark';
+      };
+      themeBtn.addEventListener('click', ()=> { dark = !dark; localStorage.setItem('pkg_theme', dark ? 'dark' : 'light'); updateThemeUI(); });
+      updateThemeUI();
 
-      // Show fallback if the iframe hasn't loaded after a timeout
-      const MAX_WAIT = 8000;
-      const SHOW_FALLBACK_AFTER = 3500; // show fallback link earlier
-      setTimeout(() => {
-        if (!loading.classList.contains('hide')) fallback.classList.add('show');
-      }, SHOW_FALLBACK_AFTER);
-
-      // final fail-safe: if after MAX_WAIT still not loaded, keep fallback visible and allow user to open directly
-      setTimeout(() => {
-        if (!loading.classList.contains('hide')) {
-          fallback.classList.add('show');
-          // Optionally hide the loader visually but keep it accessible momentarily
-          loading.classList.add('hide');
+      // fallback timeout
+      setTimeout(()=> {
+        if (loading.style.display !== 'none') {
+          loading.querySelector('.loader-card').insertAdjacentHTML('beforeend',
+            '<div style="margin-top:10px"><a href="'+WEB_APP_URL+'" target="_blank" rel="noopener noreferrer" class="btn primary">Mở hệ thống trực tiếp</a></div>');
         }
-      }, MAX_WAIT);
+      }, 4500);
 
-      // Note: iframe onerror is unreliable across browsers; using timeouts + postMessage is more robust.
+      // optional postMessage readiness support
+      window.addEventListener('message', ev=>{
+        if (ev.origin.indexOf('https://script.google.com') !== 0) return;
+        if (ev.data && ev.data.appReady) loading.style.display = 'none';
+      });
     })();
   </script>
 </body>
